@@ -111,12 +111,21 @@ const App: React.FC = () => {
     <div className="min-h-screen bg-gray-900 text-gray-100 flex flex-col items-center p-4 sm:p-6 lg:p-8">
       <div className="w-full max-w-4xl mx-auto">
         <header className="text-center mb-8">
-          <div className="inline-flex items-center gap-3 mb-2">
-            <RssIcon className="w-10 h-10 text-orange-500" />
-            <h1 className="text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-red-500">
-              Tạo Feed RSS Tự Động
-            </h1>
-          </div>
+            <div className="flex justify-center items-center gap-3 mb-2 h-10 sm:h-12">
+                {isLoading ? (
+                <div className="inline-flex items-center gap-3 animate-pulse">
+                    <RssIcon className="w-8 h-8 text-orange-400" />
+                    <div className="w-64 h-3 bg-gradient-to-r from-orange-400 to-red-500 rounded-full"></div>
+                </div>
+                ) : (
+                <div className="inline-flex items-center gap-3">
+                    <RssIcon className="w-10 h-10 text-orange-500" />
+                    <h1 className="text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-red-500">
+                    Tạo Feed RSS Tự Động
+                    </h1>
+                </div>
+                )}
+            </div>
           <p className="text-gray-400 max-w-2xl mx-auto">
             Biến bất kỳ trang web tin tức hoặc blog nào thành một RSS feed. Dán URL vào bên dưới và để AI thực hiện phần còn lại.
           </p>
@@ -137,7 +146,7 @@ const App: React.FC = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="bg-orange-600 hover:bg-orange-700 disabled:bg-orange-800 disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-md transition-all duration-200 flex items-center justify-center"
+                className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 disabled:from-red-800 disabled:to-orange-800 disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-md transition-all duration-200 flex items-center justify-center"
               >
                 {isLoading ? (
                   <>
@@ -169,52 +178,42 @@ const App: React.FC = () => {
                   </div>
                    <button
                     onClick={handleDownload}
-                    className="bg-gray-700 hover:bg-gray-600 text-gray-200 font-bold py-2 px-3 rounded-md transition duration-200 flex items-center gap-2"
-                    aria-label="Tải về file XML"
+                    className="flex items-center gap-2 bg-gray-700 hover:bg-gray-600 text-gray-300 font-medium py-2 px-4 rounded-md transition-colors"
+                    title="Tải xuống file XML"
                   >
                     <DownloadIcon className="w-5 h-5" />
-                    <span>Tải về</span>
+                    <span>Tải xuống</span>
                   </button>
                   <button
                     onClick={handleCopy}
-                    className="bg-gray-700 hover:bg-gray-600 text-gray-200 font-bold py-2 px-3 rounded-md transition duration-200 flex items-center gap-2"
-                    aria-label="Sao chép mã RSS"
+                    className="flex items-center gap-2 bg-gray-700 hover:bg-gray-600 text-gray-300 font-medium py-2 px-4 rounded-md transition-colors"
+                    title="Sao chép vào clipboard"
                   >
-                    {copied ? (
-                      <>
-                        <CheckIcon className="w-5 h-5 text-green-400" />
-                        <span>Đã sao chép!</span>
-                      </>
-                    ) : (
-                      <>
-                        <CopyIcon className="w-5 h-5" />
-                        <span>Sao chép</span>
-                      </>
-                    )}
+                    {copied ? <CheckIcon className="w-5 h-5 text-green-400" /> : <CopyIcon className="w-5 h-5" />}
+                    <span>{copied ? 'Đã chép' : 'Sao chép'}</span>
                   </button>
                 </div>
               </div>
-              
-              {view === 'raw' ? (
-                <pre className="p-4 overflow-x-auto text-sm text-yellow-200 bg-gray-900 rounded-b-lg max-h-[60vh]">
-                  <code className="whitespace-pre-wrap font-mono">{rssFeed}</code>
-                </pre>
-              ) : (
-                <div className="p-4 space-y-4 max-h-[60vh] overflow-y-auto">
-                  {parsedItems.map((item, index) => (
-                    <a key={index} href={item.link} target="_blank" rel="noopener noreferrer" className="block bg-gray-800 p-4 rounded-md border border-gray-700 hover:border-orange-500 transition-colors duration-200">
-                      <h3 className="text-lg font-bold text-orange-400">{item.title}</h3>
-                      {item.pubDate && (
-                        <p className="text-gray-400 text-xs mt-1 mb-2">
-                           {new Date(item.pubDate).toLocaleString('vi-VN', { dateStyle: 'full', timeStyle: 'short' })}
-                        </p>
-                      )}
-                      <p className="text-gray-300 text-sm" dangerouslySetInnerHTML={{ __html: item.description }}></p>
-                    </a>
-                  ))}
-                </div>
-              )}
 
+              <div className="p-4 bg-gray-900/50 rounded-b-lg overflow-hidden">
+                {view === 'raw' ? (
+                  <pre className="text-sm text-gray-300 whitespace-pre-wrap break-all overflow-x-auto max-h-[60vh] p-2 bg-gray-900 rounded">
+                    <code>{rssFeed}</code>
+                  </pre>
+                ) : (
+                  <div className="space-y-4 max-h-[60vh] overflow-y-auto p-2">
+                    {parsedItems.map((item, index) => (
+                      <div key={index} className="p-4 bg-gray-800 border border-gray-700 rounded-md hover:bg-gray-700/50 transition-colors">
+                        <h3 className="text-lg font-semibold text-orange-400 mb-1">
+                          <a href={item.link} target="_blank" rel="noopener noreferrer" className="hover:underline">{item.title}</a>
+                        </h3>
+                        {item.pubDate && <p className="text-xs text-gray-500 mb-2">{new Date(item.pubDate).toLocaleString('vi-VN')}</p>}
+                        <p className="text-gray-400 text-sm">{item.description}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </main>
@@ -223,4 +222,5 @@ const App: React.FC = () => {
   );
 };
 
+// Fix: Add default export for the App component
 export default App;
