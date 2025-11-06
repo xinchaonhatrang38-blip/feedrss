@@ -44,6 +44,7 @@ const App: React.FC = () => {
           setParsedItems(items);
           setView('pretty');
         } else {
+           // Nếu không có item nào, có thể XML không đúng định dạng mong muốn, hiển thị raw
           setParsedItems([]);
           setView('raw');
         }
@@ -73,12 +74,7 @@ const App: React.FC = () => {
     } catch (err) {
       console.error(err);
       const errorMessage = (err instanceof Error) ? err.message : 'Đã xảy ra lỗi không xác định.';
-      
-      if (errorMessage.startsWith('API_KEY_MISSING')) {
-          setError('Lỗi Cấu hình: API Key của Gemini chưa được thiết lập. Vui lòng thêm biến môi trường API_KEY vào phần cài đặt trang của bạn trên Netlify.');
-      } else {
-          setError('Đã xảy ra lỗi khi tạo RSS feed. Vui lòng kiểm tra URL hoặc thử lại sau.');
-      }
+      setError(`Không thể tạo RSS feed. ${errorMessage}`);
     } finally {
       setIsLoading(false);
     }
