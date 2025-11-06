@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 export const RssIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
@@ -8,6 +7,6 @@ export const RssIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
     fill="currentColor"
     {...props}
   >
-    <path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H8a1 1 0 0 1 1 1v1.5a1 1 0 0 1-1 1H6.5A2.5 2.5 0 0 1 4 4.5zm0 6A2.5 2.5 0 0 1 6.5 8H13a1 1 0 0 1 1 1v1.5a1 1 0 0 1-1 1H6.5A2.5 2.5 0 0 1 4 10.5zm0 6A2.5 2.5 0 0 1 6.5 14H18a1 1 0 0 1 1 1v1.5a1 1 0 0 1-1 1H6.5A2.5 2.5 0 0 1 4 16.5z"></path>
+    <path d="M6.18,15.64A2.18,2.18,0,1,1,4,17.82,2.18,2.18,0,0,1,6.18,15.64M4,4.44V7.62a12,12,0,0,1,12,12H19.5A15.5,15.5,0,0,0,4,4.44M4,10a8,8,0,0,1,8,8h3.18A11.18,11.18,0,0,0,4,10Z" />
   </svg>
 );

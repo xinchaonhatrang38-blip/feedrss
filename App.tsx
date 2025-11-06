@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback } from 'react';
 import { generateRssFeedFromUrl } from './services/geminiService';
 import { Loader } from './components/Loader';
@@ -28,7 +27,13 @@ const App: React.FC = () => {
       setRssFeed(feed);
     } catch (err) {
       console.error(err);
-      setError('Đã xảy ra lỗi khi tạo RSS feed. Vui lòng kiểm tra URL hoặc thử lại sau.');
+      const errorMessage = (err instanceof Error) ? err.message : 'Đã xảy ra lỗi không xác định.';
+      
+      if (errorMessage.startsWith('API_KEY_MISSING')) {
+          setError('Lỗi Cấu hình: API Key của Gemini chưa được thiết lập. Vui lòng thêm biến môi trường API_KEY vào phần cài đặt trang của bạn trên Netlify.');
+      } else {
+          setError('Đã xảy ra lỗi khi tạo RSS feed. Vui lòng kiểm tra URL hoặc thử lại sau.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -67,6 +72,7 @@ const App: React.FC = () => {
                 placeholder="https://www.example.com/news"
                 className="flex-grow bg-gray-800 border border-gray-600 rounded-md p-3 text-gray-200 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200"
                 required
+                aria-label="URL trang web"
               />
               <button
                 type="submit"
@@ -99,6 +105,7 @@ const App: React.FC = () => {
                 <button
                   onClick={handleCopy}
                   className="bg-gray-700 hover:bg-gray-600 text-gray-200 font-bold py-2 px-4 rounded-md transition duration-200 flex items-center gap-2"
+                  aria-label="Sao chép mã RSS"
                 >
                   {copied ? (
                     <>
