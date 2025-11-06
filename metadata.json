@@ -1,0 +1,5 @@
+{
+  "name": "Tạo Feed RSS Tự Động",
+  "description": "Một ứng dụng web sử dụng AI để tạo nguồn cấp dữ liệu RSS cho bất kỳ trang web tin tức hoặc blog nào không có sẵn. Chỉ cần nhập URL và nhận ngay mã XML RSS.",
+  "requestFramePermissions": []
+}
