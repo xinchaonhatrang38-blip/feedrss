@@ -1,5 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
-import type { Handler, HandlerEvent, HandlerContext } from "@netlify/functions";
+// FIX: Import the `stream` helper for streaming responses and remove `Handler` type.
+import { stream, type HandlerEvent } from "@netlify/functions";
 
 const createPrompt = (url: string): string => `
 Bạn là một chuyên gia phân tích nội dung web và tạo RSS feed.
@@ -19,7 +20,8 @@ Hướng dẫn:
 4.  Xây dựng đầu ra cuối cùng dưới dạng một khối XML duy nhất, được định dạng tốt. Không bao gồm bất kỳ văn bản giải thích nào trước hoặc sau mã XML. Phần tử gốc phải là <rss version="2.0">.
 `;
 
-const handler: Handler = async (event: HandlerEvent, context: HandlerContext) => {
+// FIX: Wrap the handler with the `stream` utility to enable streaming responses and fix the type error.
+const handler = stream(async (event: HandlerEvent) => {
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
@@ -49,21 +51,33 @@ const handler: Handler = async (event: HandlerEvent, context: HandlerContext) =>
     const ai = new GoogleGenAI({ apiKey });
     const prompt = createPrompt(url);
     
-    const response = await ai.models.generateContent({
+    // FIX: Rename variable to avoid conflict with imported `stream` function.
+    const geminiStream = await ai.models.generateContentStream({
       model: 'gemini-2.5-flash',
       contents: prompt,
     });
-    
-    const feedText = response.text;
-    const cleanedText = feedText.replace(/^```(xml)?\s*|```\s*$/g, '').trim();
 
+    const readableStream = new ReadableStream({
+      async start(controller) {
+        const encoder = new TextEncoder();
+        for await (const chunk of geminiStream) {
+          const text = chunk.text;
+          controller.enqueue(encoder.encode(text));
+        }
+        controller.close();
+      },
+    });
+    
     return {
       statusCode: 200,
       headers: {
         'Content-Type': 'application/rss+xml; charset=utf-8',
+        'X-Content-Type-Options': 'nosniff',
       },
-      body: cleanedText,
+      // The body can now be a ReadableStream thanks to the `stream` wrapper.
+      body: readableStream,
     };
+
   } catch (error) {
     console.error('Lỗi khi thực thi Netlify function:', error);
     const errorMessage = error instanceof Error ? error.message : "Đã xảy ra lỗi không xác định trên máy chủ.";
@@ -72,6 +86,6 @@ const handler: Handler = async (event: HandlerEvent, context: HandlerContext) =>
       body: JSON.stringify({ error: `Không thể tạo RSS feed: ${errorMessage}` }),
     };
   }
-};
+});
 
 export { handler };
